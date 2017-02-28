@@ -43,12 +43,12 @@ var manager = new WebVRManager(renderer, effect, params);
 /*** SKYBOX: http://www.custommapmakers.org/skyboxes.php ***/
 function loadSkyBox() {
   var materials = [
-    createMaterial( 'assets/skybox/ashcanyon_rt.jpg' ), // right
-    createMaterial( 'assets/skybox/ashcanyon_lf.jpg' ), // left
-    createMaterial( 'assets/skybox/ashcanyon_up.jpg' ), // top
-    createMaterial( 'assets/skybox/ashcanyon_dn.jpg' ), // bottom
-    createMaterial( 'assets/skybox/ashcanyon_bk.jpg' ), // back
-    createMaterial( 'assets/skybox/ashcanyon_ft.jpg' )  // front
+    createMaterial( 'assets/skybox/rt.jpg' ), // right
+    createMaterial( 'assets/skybox/lf.jpg' ), // left
+    createMaterial( 'assets/skybox/up.jpg' ), // top
+    createMaterial( 'assets/skybox/dn.jpg' ), // bottom
+    createMaterial( 'assets/skybox/bk.jpg' ), // back
+    createMaterial( 'assets/skybox/ft.jpg' )  // front
   ];
   var mesh = new THREE.Mesh( new THREE.BoxGeometry( 10000, 10000, 10000, 1, 1, 1 ), new THREE.MeshFaceMaterial( materials ) );
   mesh.scale.set(-1,1,1); // Set the x scale to be -1, this will turn the cube inside out
@@ -75,7 +75,7 @@ function onTextureLoaded(texture) {
 ///////////
 // FLOOR //
 ///////////
-var floorTexture = loader.load( 'assets/textures/ground-ice.jpg' );
+var floorTexture = loader.load( 'assets/textures/grass.png' );
 floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
 floorTexture.repeat.set( 3, 3 );
 var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
@@ -140,7 +140,7 @@ camera.add( listener );
 
 // sound spheres
 var sphere = new THREE.SphereGeometry( 2.5, 4, 2 );
-material_sphere1 = new THREE.MeshPhongMaterial( { ambient: 0xffffff, color: 0x7BAFD4, shading: THREE.FlatShading, shininess: 0 } );
+material_sphere1 = new THREE.MeshPhongMaterial( { ambient: 0xffffff, color: 0x2247B5, shading: THREE.FlatShading, shininess: 0 } );
 
 var audioLoader = new THREE.AudioLoader();
 
