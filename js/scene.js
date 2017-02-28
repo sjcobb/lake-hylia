@@ -43,12 +43,12 @@ var manager = new WebVRManager(renderer, effect, params);
 /*** SKYBOX: http://www.custommapmakers.org/skyboxes.php ***/
 function loadSkyBox() {
   var materials = [
-    createMaterial( 'assets/skybox/rt.jpg' ), // right
-    createMaterial( 'assets/skybox/lf.jpg' ), // left
-    createMaterial( 'assets/skybox/up.jpg' ), // top
-    createMaterial( 'assets/skybox/dn.jpg' ), // bottom
-    createMaterial( 'assets/skybox/bk.jpg' ), // back
-    createMaterial( 'assets/skybox/ft.jpg' )  // front
+    createMaterial( 'assets/skybox/sky-rt.jpg' ), // right
+    createMaterial( 'assets/skybox/sky-lf.jpg' ), // left
+    createMaterial( 'assets/skybox/sky-up.jpg' ), // top
+    createMaterial( 'assets/skybox/sky-dn.jpg' ), // bottom
+    createMaterial( 'assets/skybox/sky-bk.jpg' ), // back
+    createMaterial( 'assets/skybox/sky-ft.jpg' )  // front
   ];
   var mesh = new THREE.Mesh( new THREE.BoxGeometry( 10000, 10000, 10000, 1, 1, 1 ), new THREE.MeshFaceMaterial( materials ) );
   mesh.scale.set(-1,1,1); // Set the x scale to be -1, this will turn the cube inside out
