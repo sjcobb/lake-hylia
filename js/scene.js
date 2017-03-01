@@ -229,8 +229,9 @@ function animate(timestamp) {
   vrControls.update();
   fpVrControls.update(timestamp);
 
-
   manager.render(scene, camera, timestamp);
+  manager.render(scene2, camera, timestamp);
+
   effect.render(scene, camera);
   renderer2.render( scene2, camera );
 
