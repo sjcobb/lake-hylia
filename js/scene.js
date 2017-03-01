@@ -7,11 +7,18 @@
 var renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setPixelRatio(window.devicePixelRatio);
 
+renderer2 = new THREE.CSS3DRenderer();
+renderer2.setSize( window.innerWidth, window.innerHeight );
+renderer2.domElement.style.position = 'absolute';
+renderer2.domElement.style.top = 0;
+document.body.appendChild( renderer2.domElement );
+
 // Append the canvas element created by the renderer to document body element.
 document.body.appendChild(renderer.domElement);
 
 var clock = new THREE.Clock();
 var scene = new THREE.Scene();
+var scene2 = new THREE.Scene();
 
 /*** CAMERA ***/
 //var camera = new THREE.PerspectiveCamera(1000, window.innerWidth / window.innerHeight, 0.1, 10000); //upside down
@@ -169,6 +176,31 @@ var sign = new THREE.Mesh(geometry, material);
 cube.position.set(0, 3.5, -1); //move cube higher
 sign.position.set(-4.75, 0.25, -4.75); //left-right, top-down, forward-back
 
+/* HTML/CSS */
+//var state = hmdSensor.getState();
+//camera.style.transform = stateToCSSTransform(state);
+
+var element = document.createElement( 'div' );
+element.style.width = '100px';
+element.style.height = '100px';
+element.style.opacity = 0.5;
+element.style.background = new THREE.Color( Math.random() * 0xffffff ).getStyle();
+
+var object = new THREE.CSS3DObject( element );
+object.position.set(0, 30.5, -100);
+object.rotation.set(0, 0, 0);
+//object.scale.x = Math.random() + 0.5;
+//object.scale.y = Math.random() + 0.5;
+
+//scene.add( object );
+scene2.add( object );
+
+var geometry = new THREE.PlaneGeometry( 100, 100 );
+var mesh = new THREE.Mesh( geometry, material );
+mesh.position.copy( object.position );
+mesh.rotation.copy( object.rotation );
+mesh.scale.copy( object.scale );
+//scene.add( mesh );
 
 ///////////////////
 // LIGHT  //
@@ -197,8 +229,10 @@ function animate(timestamp) {
   vrControls.update();
   fpVrControls.update(timestamp);
 
+
   manager.render(scene, camera, timestamp);
   effect.render(scene, camera);
+  renderer2.render( scene2, camera );
 
   vrDisplay.requestAnimationFrame(animate);
 
