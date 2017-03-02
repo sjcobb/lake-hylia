@@ -8,11 +8,15 @@ var renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setPixelRatio(window.devicePixelRatio);
 
 var cssRenderer = new THREE.CSS3DRenderer();
-//cssRenderer.setPixelRatio(window.devicePixelRatio);
+cssRenderer.setPixelRatio(window.devicePixelRatio);
 cssRenderer.setSize( window.innerWidth, window.innerHeight );
 cssRenderer.domElement.style.position = 'absolute';
 cssRenderer.domElement.style.top = 0;
 document.body.appendChild( cssRenderer.domElement );
+
+/*cssRenderer = new THREE.CSS3DRenderer();
+cssRenderer.setSize( window.innerWidth, window.innerHeight );
+document.getElementById( 'container' ).appendChild( cssRenderer.domElement );*/
 
 // Append the canvas element created by the renderer to document body element.
 document.body.appendChild(renderer.domElement);
@@ -40,8 +44,8 @@ fpVrControls.movementSpeed = 10;
 var effect = new THREE.VREffect(renderer);
 effect.setSize(window.innerWidth, window.innerHeight);
 
-//var cssEffect = new THREE.VREffect(cssRenderer);
-//cssEffect.setSize(window.innerWidth, window.innerHeight);
+var cssEffect = new THREE.VREffect(cssRenderer);
+cssEffect.setSize(window.innerWidth, window.innerHeight);
 
 // Create a VR manager helper to enter and exit VR mode.
 var params = {
@@ -230,10 +234,10 @@ function animate(timestamp) {
   fpVrControls.update(timestamp);
 
   manager.render(scene, camera, timestamp);
-  //manager.render(cssScene, camera, timestamp);
+  manager.render(cssScene, camera, timestamp);
 
   effect.render(scene, camera);
-  //cssEffect.render(cssScene, camera);
+  cssEffect.render(cssScene, camera);
 
   cssRenderer.render( cssScene, camera );
 

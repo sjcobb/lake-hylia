@@ -96,6 +96,22 @@ THREE.CSS3DRenderer = function () {
 
 	};
 
+	this.getPixelRatio = function () {
+
+		return _pixelRatio;
+
+	};
+
+	this.setPixelRatio = function ( value ) {
+
+		if ( value === undefined ) return;
+
+		_pixelRatio = value;
+
+		//this.setSize( _viewport.z, _viewport.w, false );
+
+	};
+
 	var epsilon = function ( value ) {
 
 		return Math.abs( value ) < Number.EPSILON ? 0 : value;
