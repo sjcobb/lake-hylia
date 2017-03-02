@@ -106,7 +106,7 @@ THREE.CSS3DRenderer = function () {
 
 		if ( value === undefined ) return;
 
-		_pixelRatio = value;
+		_pixelRatio = 1;
 
 		//this.setSize( _viewport.z, _viewport.w, false );
 
