@@ -236,10 +236,10 @@ function animate(timestamp) {
   manager.render(scene, camera, timestamp);
   manager.render(cssScene, camera, timestamp);
 
-  effect.render(scene, camera);
   cssEffect.render(cssScene, camera);
+  effect.render(scene, camera);
 
-  cssRenderer.render( cssScene, camera );
+  //cssRenderer.render( cssScene, camera );
 
   vrDisplay.requestAnimationFrame(animate);
 

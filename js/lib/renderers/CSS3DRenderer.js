@@ -43,6 +43,8 @@ THREE.CSS3DRenderer = function () {
 	var _width, _height;
 	var _widthHalf, _heightHalf;
 
+	var _pixelRatio = 1;
+
 	var matrix = new THREE.Matrix4();
 
 	var cache = {
@@ -104,11 +106,7 @@ THREE.CSS3DRenderer = function () {
 
 	this.setPixelRatio = function ( value ) {
 
-		if ( value === undefined ) return;
-
-		_pixelRatio = 1;
-
-		//this.setSize( _viewport.z, _viewport.w, false );
+		if ( value !== undefined ) _pixelRatio = value;
 
 	};
 
