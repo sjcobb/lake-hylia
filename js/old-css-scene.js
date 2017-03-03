@@ -7,11 +7,23 @@
 var renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setPixelRatio(window.devicePixelRatio);
 
+var cssRenderer = new THREE.CSS3DRenderer();
+cssRenderer.setPixelRatio(window.devicePixelRatio);
+cssRenderer.setSize( window.innerWidth, window.innerHeight );
+cssRenderer.domElement.style.position = 'absolute';
+cssRenderer.domElement.style.top = 0;
+document.body.appendChild( cssRenderer.domElement );
+
+/*cssRenderer = new THREE.CSS3DRenderer();
+cssRenderer.setSize( window.innerWidth, window.innerHeight );
+document.getElementById( 'container' ).appendChild( cssRenderer.domElement );*/
+
 // Append the canvas element created by the renderer to document body element.
 document.body.appendChild(renderer.domElement);
 
 var clock = new THREE.Clock();
 var scene = new THREE.Scene();
+var cssScene = new THREE.Scene();
 
 /*** CAMERA ***/
 //var camera = new THREE.PerspectiveCamera(1000, window.innerWidth / window.innerHeight, 0.1, 10000); //upside down
@@ -31,6 +43,9 @@ fpVrControls.movementSpeed = 10;
 // Apply VR stereo rendering to renderer.
 var effect = new THREE.VREffect(renderer);
 effect.setSize(window.innerWidth, window.innerHeight);
+
+var cssEffect = new THREE.VREffect(cssRenderer);
+cssEffect.setSize(window.innerWidth, window.innerHeight);
 
 // Create a VR manager helper to enter and exit VR mode.
 var params = {
@@ -165,6 +180,32 @@ var geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
 var material = new THREE.MeshNormalMaterial();
 //var cube = new THREE.Mesh(geometry, material);
 
+/* HTML/CSS */
+//var state = hmdSensor.getState();
+//camera.style.transform = stateToCSSTransform(state);
+
+var element = document.createElement( 'div' );
+element.style.width = '100px';
+element.style.height = '100px';
+element.style.opacity = 0.5;
+element.style.background = new THREE.Color( Math.random() * 0xffffff ).getStyle();
+
+var object = new THREE.CSS3DObject( element );
+object.position.set(0, 30.5, -150);
+object.rotation.set(0, 0, 0);
+//object.scale.x = Math.random() + 0.5;
+//object.scale.y = Math.random() + 0.5;
+
+//scene.add( object );
+cssScene.add( object );
+
+var geometry = new THREE.PlaneGeometry( 100, 100 );
+var mesh = new THREE.Mesh( geometry, material );
+mesh.position.copy( object.position );
+mesh.rotation.copy( object.rotation );
+mesh.scale.copy( object.scale );
+//scene.add( mesh );
+
 ///////////////////
 // LIGHT  //
 ///////////////////
@@ -193,8 +234,12 @@ function animate(timestamp) {
   fpVrControls.update(timestamp);
 
   manager.render(scene, camera, timestamp);
+  manager.render(cssScene, camera, timestamp);
 
+  cssEffect.render(cssScene, camera);
   effect.render(scene, camera);
+
+  //cssRenderer.render( cssScene, camera );
 
   vrDisplay.requestAnimationFrame(animate);
 
