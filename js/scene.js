@@ -2,16 +2,23 @@
  *** CUSTOM JS ***
 */
 
-// Setup three.js WebGL renderer. Note: Antialiasing is a big performance hit.
-// Only enable it if you actually need to.
+
 var renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setPixelRatio(window.devicePixelRatio);
 
-// Append the canvas element created by the renderer to document body element.
 document.body.appendChild(renderer.domElement);
 
 var clock = new THREE.Clock();
 var scene = new THREE.Scene();
+
+var origin, follower;
+var direction = new THREE.Vector3(0, 0, 1);
+var direction_follower = new THREE.Vector3(0, 0, 1);
+var speed = 100; // units per second
+var follower_speed = 50;
+var clock = new THREE.Clock();
+var delta, shift = new THREE.Vector3(), shift_follower = new THREE.Vector3();
+var epsilon = speed / 60;
 
 /*** CAMERA ***/
 //var camera = new THREE.PerspectiveCamera(1000, window.innerWidth / window.innerHeight, 0.1, 10000); //upside down
@@ -161,9 +168,23 @@ mesh1.add( sound1 );
 // OBJECTS //
 /////////////
 // Create 3D objects.
-var geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+var geometry = new THREE.BoxGeometry(2.5, 2.5, 2.5);
 var material = new THREE.MeshNormalMaterial();
 //var cube = new THREE.Mesh(geometry, material);
+
+var neg_bound = -10;
+var pos_bound = 10;
+
+origin = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial({
+  color: "red"
+}));
+origin.position.set(pos_bound, 3.5, -10);
+scene.add(origin);
+
+follower = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial({color: "green"}));
+follower.position.set(neg_bound, 3.5, -15);
+scene.add(follower);
+
 
 ///////////////////
 // LIGHT  //
@@ -185,8 +206,25 @@ var lastRender = 0;
 function animate(timestamp) {
   var delta = Math.min(timestamp - lastRender, 500);
   lastRender = timestamp;
-
   var elapsed = clock.getElapsedTime();
+
+  mesh1.rotation.y += delta * 0.0006;
+
+  /*if (origin.position.x > pos_bound) { direction.negate(); origin.position.x = pos_bound;}
+  if (origin.position.x < neg_bound) { direction.negate(); origin.position.x = neg_bound;}
+  shift.copy(direction).normalize().multiplyScalar(speed * delta);
+  console.log(shift);
+  origin.position.add(shift);
+  
+  if (follower.position.x > pos_bound) { direction_follower.negate(); follower.position.x = pos_bound;}
+  if (follower.position.x < neg_bound) { direction_follower.negate(); follower.position.x = neg_bound;}
+
+  if (Math.sign(direction_follower.x) != Math.sign(direction.x)) {
+    if (follower.position.x <= origin.position.x + epsilon && follower.position.x >= origin.position.x - epsilon) direction_follower.negate();
+  }
+
+  shift_follower.copy(direction_follower).normalize().multiplyScalar(follower_speed * delta);
+  follower.position.add(shift_follower);*/
   
   controls.update();
   vrControls.update();
@@ -197,8 +235,6 @@ function animate(timestamp) {
   effect.render(scene, camera);
 
   vrDisplay.requestAnimationFrame(animate);
-
-  mesh1.rotation.y += delta * 0.0006;
 }
 
 function onResize(e) {
