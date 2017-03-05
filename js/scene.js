@@ -173,6 +173,16 @@ mesh1.add( sound1 );
 
 /*** NAVI ***/
 //github.com/stemkoski/stemkoski.github.com/blob/master/Three.js/Simple-Glow.html
+
+//merge: http://stackoverflow.com/questions/8322759/three-js-bind-two-shapes-together-as-one
+/*var sphere = new THREE.Mesh( new THREE.SphereGeometry(100,16,12), new THREE.MeshLambertMaterial( { color: 0x2D303D, wireframe: true, shading: THREE.FlatShading } ));
+var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(100, 100, 200, 16, 4, false ), new THREE.MeshLambertMaterial( { color: 0x2D303D, wireframe: true, shading: THREE.FlatShading } ));
+cylinder.position.y = -100;
+scene.add(sphere);
+scene.add(cylinder);*/
+
+var wing1 = new THREE.CircleGeometry( 5, 32 );
+
 var spriteMaterial = new THREE.SpriteMaterial({ 
   map: loader.load( 'assets/textures/glow.png' ), 
   useScreenCoordinates: false, 
@@ -183,14 +193,13 @@ var spriteMaterial = new THREE.SpriteMaterial({
 });
 var sprite = new THREE.Sprite( spriteMaterial );
 sprite.scale.set(0.7, 0.7, 1.0);
-//sprite.scale.set(1, 1, 1.0);
-//sprite.scale.set(20, 20, 1.0);
 
 var navi_g = new THREE.SphereGeometry(0.15, 20, 20);
 var navi_m = new THREE.MeshPhongMaterial({color: 0xD8EDED, transparent: true, opacity: 0.3, shininess: 30});
 
 navi = new THREE.Mesh( navi_g, navi_m);
 navi.add(sprite);
+//navi.add(wing1);
 
 scene.add(navi);
 
