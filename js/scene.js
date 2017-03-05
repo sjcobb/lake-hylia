@@ -11,13 +11,13 @@ document.body.appendChild(renderer.domElement);
 var clock = new THREE.Clock();
 var scene = new THREE.Scene();
 
-var origin, follower;
+var origin, navi;
 var direction = new THREE.Vector3(0, 0, 1);
-var direction_follower = new THREE.Vector3(0, 0, 1);
+var direction_navi = new THREE.Vector3(0, 0, 1);
 var speed = 100; // units per second
-var follower_speed = 50;
+var navi_speed = 50;
 var clock = new THREE.Clock();
-var delta, shift = new THREE.Vector3(), shift_follower = new THREE.Vector3();
+var delta, shift = new THREE.Vector3(), shift_navi = new THREE.Vector3();
 var epsilon = speed / 60;
 
 /*** CAMERA ***/
@@ -167,23 +167,18 @@ mesh1.add( sound1 );
 /////////////
 // OBJECTS //
 /////////////
-// Create 3D objects.
-var geometry = new THREE.BoxGeometry(2.5, 2.5, 2.5);
+
+//var navi_geometry = new THREE.BoxGeometry(2.5, 2.5, 2.5);
+//var navi_geometry = new THREE.SphereGeometry(3, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
+var navi_geometry = new THREE.SphereGeometry(0.2, 20, 20, 0, Math.PI * 2, 0, Math.PI * 2);
 var material = new THREE.MeshNormalMaterial();
 //var cube = new THREE.Mesh(geometry, material);
 
-var neg_bound = -10;
-var pos_bound = 10;
+navi = new THREE.Mesh( navi_geometry, new THREE.MeshBasicMaterial({color: 0x00ADEF, transparent: true, opacity: 0.5}));
+//navi = new THREE.Mesh( navi_geometry, new THREE.MeshBasicMaterial({color: 0xD8EDED, transparent: true, opacity: 0.5}));
 
-origin = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial({
-  color: "red"
-}));
-origin.position.set(pos_bound, 3.5, -10);
-scene.add(origin);
-
-follower = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial({color: "green"}));
-follower.position.set(neg_bound, 3.5, -15);
-scene.add(follower);
+navi.position.set(camera.position.x - 2.5, camera.position.y + 2, camera.position.z - 4);
+scene.add(navi);
 
 
 ///////////////////
@@ -210,22 +205,10 @@ function animate(timestamp) {
 
   mesh1.rotation.y += delta * 0.0006;
 
-  /*if (origin.position.x > pos_bound) { direction.negate(); origin.position.x = pos_bound;}
-  if (origin.position.x < neg_bound) { direction.negate(); origin.position.x = neg_bound;}
-  shift.copy(direction).normalize().multiplyScalar(speed * delta);
-  console.log(shift);
-  origin.position.add(shift);
-  
-  if (follower.position.x > pos_bound) { direction_follower.negate(); follower.position.x = pos_bound;}
-  if (follower.position.x < neg_bound) { direction_follower.negate(); follower.position.x = neg_bound;}
+  //console.log(camera.position);
+  //navi.position.z -= 1;
+  navi.position.set(camera.position.x - 2.5, camera.position.y + 2, camera.position.z - 4);
 
-  if (Math.sign(direction_follower.x) != Math.sign(direction.x)) {
-    if (follower.position.x <= origin.position.x + epsilon && follower.position.x >= origin.position.x - epsilon) direction_follower.negate();
-  }
-
-  shift_follower.copy(direction_follower).normalize().multiplyScalar(follower_speed * delta);
-  follower.position.add(shift_follower);*/
-  
   controls.update();
   vrControls.update();
   fpVrControls.update(timestamp);
