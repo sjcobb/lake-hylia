@@ -171,39 +171,28 @@ mesh1.add( sound1 );
 // OBJECTS //
 /////////////
 
-var glow_m = new THREE.ShaderMaterial( 
-  {
-      uniforms: 
-    { 
-      "c":   { type: "f", value: 1.0 },
-      "p":   { type: "f", value: 1.4 },
-      glowColor: { type: "c", value: new THREE.Color(0xffff00) },
-      viewVector: { type: "v3", value: camera.position }
-    },
-    vertexShader:   document.getElementById( 'vertexShader'   ).textContent,
-    fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
-    side: THREE.FrontSide,
-    blending: THREE.AdditiveBlending,
-    transparent: true
-  }   );
+/*** NAVI ***/
+//github.com/stemkoski/stemkoski.github.com/blob/master/Three.js/Simple-Glow.html
+var spriteMaterial = new THREE.SpriteMaterial({ 
+  map: loader.load( 'assets/textures/glow.png' ), 
+  useScreenCoordinates: false, 
+  //alignment: THREE.SpriteAlignment.center,
+  color: 0x0000ff, 
+  transparent: false, 
+  blending: THREE.AdditiveBlending
+});
+var sprite = new THREE.Sprite( spriteMaterial );
+sprite.scale.set(0.7, 0.7, 1.0);
+//sprite.scale.set(1, 1, 1.0);
+//sprite.scale.set(20, 20, 1.0);
 
-
-//var navi_geometry = new THREE.SphereGeometry(3, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
-var navi_g = new THREE.SphereGeometry(0.2, 20, 20);
-var navi_m = new THREE.MeshPhongMaterial({color: 0x00ADEF, transparent: true, opacity: 0.5, shininess: 100});
-
-var navi_g2 = new THREE.SphereGeometry(0.15, 20, 20);
-var navi_m2 = new THREE.MeshPhongMaterial({color: 0xD8EDED, transparent: true, opacity: 0.5, shininess: 100});
+var navi_g = new THREE.SphereGeometry(0.15, 20, 20);
+var navi_m = new THREE.MeshPhongMaterial({color: 0xD8EDED, transparent: true, opacity: 0.3, shininess: 30});
 
 navi = new THREE.Mesh( navi_g, navi_m);
-//navi = new THREE.Mesh( navi_geometry, new THREE.MeshBasicMaterial({color: 0xD8EDED, transparent: true, opacity: 0.5}));
+navi.add(sprite);
 
-navi2 = new THREE.Mesh( navi_g2, glow_m);
-
-//navi.position.set(camera.position.x - 2.5, camera.position.y + 2, camera.position.z - 4);
-//navi2.position.set(camera.position.x - 1.5, camera.position.y + 2, camera.position.z - 4);
 scene.add(navi);
-scene.add(navi2);
 
 
 ///////////////////
@@ -234,7 +223,6 @@ function animate(timestamp) {
   mesh1.rotation.y += delta * 0.0006;
 
   navi.position.set(camera.position.x - 2.5, camera.position.y + 2, camera.position.z - 4);
-  navi2.position.set(camera.position.x - 2.4, camera.position.y + 2, camera.position.z - 4);
 
   //controls.update();
   vrControls.update();
