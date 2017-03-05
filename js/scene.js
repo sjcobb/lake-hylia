@@ -46,6 +46,9 @@ var params = {
 };
 var manager = new WebVRManager(renderer, effect, params);
 
+window.addEventListener('resize', onResize, true);
+window.addEventListener('vrdisplaypresentchange', onResize, true);
+
 /*** LOAD TEXTURES ***/
 /*** SKYBOX: http://www.custommapmakers.org/skyboxes.php ***/
 function loadSkyBox() {
@@ -168,33 +171,58 @@ mesh1.add( sound1 );
 // OBJECTS //
 /////////////
 
-//var navi_geometry = new THREE.BoxGeometry(2.5, 2.5, 2.5);
-//var navi_geometry = new THREE.SphereGeometry(3, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
-var navi_geometry = new THREE.SphereGeometry(0.2, 20, 20, 0, Math.PI * 2, 0, Math.PI * 2);
-var material = new THREE.MeshNormalMaterial();
-//var cube = new THREE.Mesh(geometry, material);
+var glow_m = new THREE.ShaderMaterial( 
+  {
+      uniforms: 
+    { 
+      "c":   { type: "f", value: 1.0 },
+      "p":   { type: "f", value: 1.4 },
+      glowColor: { type: "c", value: new THREE.Color(0xffff00) },
+      viewVector: { type: "v3", value: camera.position }
+    },
+    vertexShader:   document.getElementById( 'vertexShader'   ).textContent,
+    fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+    side: THREE.FrontSide,
+    blending: THREE.AdditiveBlending,
+    transparent: true
+  }   );
 
-navi = new THREE.Mesh( navi_geometry, new THREE.MeshBasicMaterial({color: 0x00ADEF, transparent: true, opacity: 0.5}));
+
+//var navi_geometry = new THREE.SphereGeometry(3, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
+var navi_g = new THREE.SphereGeometry(0.2, 20, 20);
+var navi_m = new THREE.MeshPhongMaterial({color: 0x00ADEF, transparent: true, opacity: 0.5, shininess: 100});
+
+var navi_g2 = new THREE.SphereGeometry(0.15, 20, 20);
+var navi_m2 = new THREE.MeshPhongMaterial({color: 0xD8EDED, transparent: true, opacity: 0.5, shininess: 100});
+
+navi = new THREE.Mesh( navi_g, navi_m);
 //navi = new THREE.Mesh( navi_geometry, new THREE.MeshBasicMaterial({color: 0xD8EDED, transparent: true, opacity: 0.5}));
 
-navi.position.set(camera.position.x - 2.5, camera.position.y + 2, camera.position.z - 4);
+navi2 = new THREE.Mesh( navi_g2, glow_m);
+
+//navi.position.set(camera.position.x - 2.5, camera.position.y + 2, camera.position.z - 4);
+//navi2.position.set(camera.position.x - 1.5, camera.position.y + 2, camera.position.z - 4);
 scene.add(navi);
+scene.add(navi2);
 
 
 ///////////////////
 // LIGHT  //
 ///////////////////
-var ambient = new THREE.AmbientLight( 0x444444 );
+var ambientLight = new THREE.AmbientLight( 0x444444 );
 //var ambient = new THREE.AmbientLight( 0x101030 );
-scene.add( ambient );
+scene.add( ambientLight );
 
 var directionalLight = new THREE.DirectionalLight( 0xffeedd );
 directionalLight.position.set( 0, 0, 1 ).normalize();
+//directionalLight.position = camera.position;
+//directionalLight.position = navi.position;
 scene.add( directionalLight );
 
+var pointLight = new THREE.PointLight(0xffffff);
+scene.add( pointLight );
 
-window.addEventListener('resize', onResize, true);
-window.addEventListener('vrdisplaypresentchange', onResize, true);
+
 
 // Request animation frame loop function
 var lastRender = 0;
@@ -205,11 +233,10 @@ function animate(timestamp) {
 
   mesh1.rotation.y += delta * 0.0006;
 
-  //console.log(camera.position);
-  //navi.position.z -= 1;
   navi.position.set(camera.position.x - 2.5, camera.position.y + 2, camera.position.z - 4);
+  navi2.position.set(camera.position.x - 2.4, camera.position.y + 2, camera.position.z - 4);
 
-  controls.update();
+  //controls.update();
   vrControls.update();
   fpVrControls.update(timestamp);
 
