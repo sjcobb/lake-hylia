@@ -33,7 +33,7 @@ var vrControls = new THREE.VRControls(camera);
 //vrControls.standing = true;
 var fpVrControls = new THREE.FirstPersonVRControls(camera, scene);
 fpVrControls.verticalMovement = true;
-fpVrControls.movementSpeed = 10;
+fpVrControls.movementSpeed = 15;
 
 // Apply VR stereo rendering to renderer.
 var effect = new THREE.VREffect(renderer);
@@ -111,20 +111,10 @@ brickTexture.repeat.set( 1, 1 );
 var brickMaterial = new THREE.MeshBasicMaterial( { map: brickTexture, side: THREE.DoubleSide } );
 var brickGeometry = new THREE.PlaneGeometry(80, 50, 1, 1);
 
-var wall1 = new THREE.Mesh(wallGeometry, wallMaterial);
 var wall2 = new THREE.Mesh(wallGeometry, wallMaterial);
 var wall3 = new THREE.Mesh(brickGeometry, brickMaterial);
 var wall4 = new THREE.Mesh(brickGeometry, brickMaterial);
 var wall5 = new THREE.Mesh(brickGeometry, brickMaterial);
-//floor.position.y = -0.5;
-
-/* Front Wall */
-wall1.position.x = 0;
-wall1.position.y = wall_y_pos; //up down
-wall1.position.z = -15; //further away
-var wall_rotation = 0.01;
-//wall1.rotation.x = wall_rotation;
-//scene.add(wall1);
 
 /* Back Wall */
 wall2.position.x = 0;
@@ -173,15 +163,33 @@ mesh1.add( sound1 );
 
 /*** NAVI ***/
 //github.com/stemkoski/stemkoski.github.com/blob/master/Three.js/Simple-Glow.html
-
 //merge: http://stackoverflow.com/questions/8322759/three-js-bind-two-shapes-together-as-one
-/*var sphere = new THREE.Mesh( new THREE.SphereGeometry(100,16,12), new THREE.MeshLambertMaterial( { color: 0x2D303D, wireframe: true, shading: THREE.FlatShading } ));
-var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(100, 100, 200, 16, 4, false ), new THREE.MeshLambertMaterial( { color: 0x2D303D, wireframe: true, shading: THREE.FlatShading } ));
-cylinder.position.y = -100;
-scene.add(sphere);
-scene.add(cylinder);*/
 
-var wing1 = new THREE.CircleGeometry( 5, 32 );
+var x = 0, y = 0;
+
+var heartShape = new THREE.Shape();
+
+heartShape.moveTo( x + 5, y + 5 );
+heartShape.bezierCurveTo( x + 5, y + 5, x + 4, y, x, y );
+heartShape.bezierCurveTo( x - 6, y, x - 6, y + 7,x - 6, y + 7 );
+heartShape.bezierCurveTo( x - 6, y + 11, x - 3, y + 15.4, x + 5, y + 19 );
+//heartShape.bezierCurveTo( x + 12, y + 15.4, x + 16, y + 11, x + 16, y + 7 );
+//heartShape.bezierCurveTo( x + 16, y + 7, x + 16, y, x + 10, y );
+//heartShape.bezierCurveTo( x + 7, y, x + 5, y + 5, x + 5, y + 5 );
+console.log(heartShape);
+
+var geometry = new THREE.ShapeGeometry( heartShape );
+var material = new THREE.MeshBasicMaterial( { color: 0xD8EDED } );
+var wing2 = new THREE.Mesh( geometry, material ) ;
+wing2.scale.set(.01, .01, .01);
+wing2.rotation.x = Math.PI / 2;
+wing2.position.x = -0.2;
+
+var wing_g = new THREE.CircleGeometry( 0.1, 32 );
+var wing_m = new THREE.MeshBasicMaterial( { color: 0xD8EDED } );
+var wing = new THREE.Mesh(wing_g, wing_m);
+//wing.position.set(camera.position.x, camera.position.y + 2, camera.position.z - 4);
+//scene.add( wing );
 
 var spriteMaterial = new THREE.SpriteMaterial({ 
   map: loader.load( 'assets/textures/glow.png' ), 
@@ -199,7 +207,8 @@ var navi_m = new THREE.MeshPhongMaterial({color: 0xD8EDED, transparent: true, op
 
 navi = new THREE.Mesh( navi_g, navi_m);
 navi.add(sprite);
-//navi.add(wing1);
+//navi.add(wing);
+navi.add(wing2);
 
 scene.add(navi);
 
