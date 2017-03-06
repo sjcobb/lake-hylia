@@ -168,28 +168,30 @@ mesh1.add( sound1 );
 var x = 0, y = 0;
 
 var heartShape = new THREE.Shape();
-
 heartShape.moveTo( x + 5, y + 5 );
 heartShape.bezierCurveTo( x + 5, y + 5, x + 4, y, x, y );
 heartShape.bezierCurveTo( x - 6, y, x - 6, y + 7,x - 6, y + 7 );
 heartShape.bezierCurveTo( x - 6, y + 11, x - 3, y + 15.4, x + 5, y + 19 );
-//heartShape.bezierCurveTo( x + 12, y + 15.4, x + 16, y + 11, x + 16, y + 7 );
-//heartShape.bezierCurveTo( x + 16, y + 7, x + 16, y, x + 10, y );
-//heartShape.bezierCurveTo( x + 7, y, x + 5, y + 5, x + 5, y + 5 );
-console.log(heartShape);
 
-var geometry = new THREE.ShapeGeometry( heartShape );
-var material = new THREE.MeshBasicMaterial( { color: 0xD8EDED } );
-var wing2 = new THREE.Mesh( geometry, material ) ;
-wing2.scale.set(.01, .01, .01);
-wing2.rotation.x = Math.PI / 2;
-wing2.position.x = -0.2;
-
-var wing_g = new THREE.CircleGeometry( 0.1, 32 );
+var wing_g = new THREE.ShapeGeometry( heartShape );
 var wing_m = new THREE.MeshBasicMaterial( { color: 0xD8EDED } );
-var wing = new THREE.Mesh(wing_g, wing_m);
-//wing.position.set(camera.position.x, camera.position.y + 2, camera.position.z - 4);
-//scene.add( wing );
+var wing = new THREE.Mesh( wing_g, wing_m ) ;
+var wing2 = new THREE.Mesh( wing_g, wing_m ) ;
+
+wing.scale.set(.01, .01, .01);
+//wing.rotation.x = 1.37;
+wing.rotation.x = 1.50; //flip
+wing.rotation.y = -0.5; //roll
+wing.rotation.z = 5.0; //around
+//wing.rotation.z = -1.0;
+wing.position.y = 0.06;
+wing.position.x = -0.3;
+
+wing2.scale.set(.01, .01, .01);
+wing2.rotation.x = 1.37;
+wing2.rotation.z = 2.28;
+wing2.position.x = 0.30;
+
 
 var spriteMaterial = new THREE.SpriteMaterial({ 
   map: loader.load( 'assets/textures/glow.png' ), 
@@ -203,11 +205,11 @@ var sprite = new THREE.Sprite( spriteMaterial );
 sprite.scale.set(0.7, 0.7, 1.0);
 
 var navi_g = new THREE.SphereGeometry(0.15, 20, 20);
-var navi_m = new THREE.MeshPhongMaterial({color: 0xD8EDED, transparent: true, opacity: 0.3, shininess: 30});
+var navi_m = new THREE.MeshPhongMaterial({color: 0xD8EDED, transparent: true, opacity: 0.7, shininess: 30});
 
 navi = new THREE.Mesh( navi_g, navi_m);
 navi.add(sprite);
-//navi.add(wing);
+navi.add(wing);
 navi.add(wing2);
 
 scene.add(navi);
@@ -240,7 +242,11 @@ function animate(timestamp) {
 
   mesh1.rotation.y += delta * 0.0006;
 
-  navi.position.set(camera.position.x - 2.5, camera.position.y + 2, camera.position.z - 4);
+  var rdm_shift = Math.random();
+  var rdm_shift = 0;
+  var navi_shift = camera.position.x - rdm_shift;
+  navi.position.set(navi_shift, camera.position.y + 2, camera.position.z - 4);
+  //navi.position.x += 1.2;
 
   //controls.update();
   vrControls.update();
