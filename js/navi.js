@@ -1,70 +1,76 @@
-var camera, scene, renderer, controls;
-var origin, follower;
-var direction = new THREE.Vector3(0, 0, 1);
-var direction_follower = new THREE.Vector3(0, 0, 1);
-var speed = 1000; // units per second
-var follower_speed = 500;
-var clock = new THREE.Clock();
-var delta, shift = new THREE.Vector3(), shift_follower = new THREE.Vector3();
-var epsilon = speed / 60;
+/*** NAVI ***/
+var x = 0, y = 0;
 
-init();
-animate();
+var heartShape = new THREE.Shape();
+heartShape.moveTo( x + 5, y + 5 );
+heartShape.bezierCurveTo( x + 5, y + 5, x + 4, y, x, y );
+heartShape.bezierCurveTo( x - 6, y, x - 6, y + 7,x - 6, y + 7 );
+heartShape.bezierCurveTo( x - 6, y + 11, x - 3, y + 15.4, x + 5, y + 19 );
 
-function init() {
+var wing_g = new THREE.ShapeGeometry( heartShape );
+var wing_m = new THREE.MeshBasicMaterial( { color: 0xD8EDED } );
+var wing = new THREE.Mesh( wing_g, wing_m ) ;
+var wing2 = new THREE.Mesh( wing_g, wing_m ) ;
 
-  scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 20000);
-  camera.position.set(-1, 1, 0).setLength(10000);
+wing.scale.set(.01, .01, .01);
+//wing.rotation.x = 1.37;
+wing.rotation.x = 1.50; //flip
+wing.rotation.y = -0.5; //roll
+wing.rotation.z = 5.0; //around
+//wing.rotation.z = -1.0;
+wing.position.y = 0.06;
+wing.position.x = -0.3;
 
-  renderer = new THREE.WebGLRenderer();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  //renderer.setClearColor(0xCCCCCC);
-  document.body.appendChild(renderer.domElement);
+wing2.scale.set(.01, .01, .01);
+wing2.rotation.x = 1.37;
+wing2.rotation.z = 2.28;
+wing2.position.x = 0.30;
 
-  controls = new THREE.OrbitControls(camera, renderer.domElement);
+var spriteMaterial = new THREE.SpriteMaterial({ 
+  map: loader.load( 'assets/textures/glow.png' ), 
+  useScreenCoordinates: false, 
+  //alignment: THREE.SpriteAlignment.center,
+  color: 0x0000ff, 
+  transparent: false, 
+  blending: THREE.AdditiveBlending
+});
+var sprite = new THREE.Sprite( spriteMaterial );
+sprite.scale.set(0.7, 0.7, 1.0);
 
-  var plane = new THREE.GridHelper(5000, 10, 0xffffff, 0x555555);
-	
-  var geometry = new THREE.BoxGeometry(100, 100, 1000);
-  origin = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial({
-    color: "red"
-  }));
-  origin.position.set(5000, 0, 0);
-  scene.add(origin);
-  
-  follower = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial({color: "green"}));
-	follower.position.set(-5000, 0, 0);
-  scene.add(follower);
+var navi_g = new THREE.SphereGeometry(0.15, 20, 20);
+var navi_m = new THREE.MeshPhongMaterial({color: 0xD8EDED, transparent: true, opacity: 0.7, shininess: 30});
 
-  scene.add(plane);
-}
+navi = new THREE.Mesh( navi_g, navi_m);
+navi.add(sprite);
+navi.add(wing);
+navi.add(wing2);
+navi.rotation.x = 0;
+navi.rotation.y = 0.5;
+navi.rotation.z = 0.3;
+scene.add(navi);
 
+var navi_sound = new THREE.PositionalAudio( listener );
+audioLoader.load( 'assets/sounds/navi/OOT_Navi_Listen1.wav', function( buffer ) {
+  navi_sound.setBuffer( buffer );
+  navi_sound.setRefDistance( 0.03 );
+  navi_sound.setVolume(100);
+  //navi_sound.setLoop(true);
+  navi_sound.play();
+});
+navi.add( navi_sound );
 
-// animate
-function animate() {
-  delta = clock.getDelta();
-  requestAnimationFrame(animate);
-	
-  if (origin.position.z > 5000) { direction.negate();origin.position.z = 5000;}
-  if (origin.position.z < -5000) { direction.negate();origin.position.z = -5000;}
-  shift.copy(direction).normalize().multiplyScalar(speed * delta);
-  origin.position.add(shift);
-  
-	if (follower.position.z > 5000) { direction_follower.negate();follower.position.z = 5000;}
-  if (follower.position.z < -5000) { direction_follower.negate();follower.position.z = -5000;}
-  
-  
-  if (Math.sign(direction_follower.z) != Math.sign(direction.z)){
-  	if (follower.position.z <= origin.position.z + epsilon && follower.position.z >= origin.position.z - epsilon) direction_follower.negate();
-  }
-  
-  shift_follower.copy(direction_follower).normalize().multiplyScalar(follower_speed * delta);
-  follower.position.add(shift_follower);
+var rdm_shift = 0;
+setInterval(function() {
+  //rdm_shift = Math.random() - 0.2;
+  rdm_shift = Math.random();
+  //console.log(rdm_shift);
+}, 3000);
+setInterval(function() {
+  navi_sound.play();
+}, 18000);
 
-  render();
-}
-
-function render() {
-  renderer.render(scene, camera);
+function renderNavi() {
+  var navi_shiftx = camera.position.x - 1.3 - rdm_shift;
+  var navi_shifty = camera.position.y + 2 - rdm_shift;
+  navi.position.set(navi_shiftx, navi_shifty, camera.position.z - 4);
 }
