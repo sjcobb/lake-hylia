@@ -132,6 +132,22 @@ wall4.position.set(30, 5, 0);
 wall4.rotation.y = Math.PI / 2;
 scene.add(wall4);
 
+///////////////////
+// LIGHT  //
+///////////////////
+var ambientLight = new THREE.AmbientLight( 0x444444 );
+//var ambient = new THREE.AmbientLight( 0x101030 );
+scene.add( ambientLight );
+
+var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+directionalLight.position.set( 0, 0, 1 ).normalize();
+//directionalLight.position = camera.position;
+//directionalLight.position = navi.position;
+scene.add( directionalLight );
+
+var pointLight = new THREE.PointLight(0xffffff);
+scene.add( pointLight );
+
 ///////////
 // SOUND //
 ///////////
@@ -162,9 +178,6 @@ mesh1.add( sound1 );
 /////////////
 
 /*** NAVI ***/
-//github.com/stemkoski/stemkoski.github.com/blob/master/Three.js/Simple-Glow.html
-//merge: http://stackoverflow.com/questions/8322759/three-js-bind-two-shapes-together-as-one
-
 var x = 0, y = 0;
 
 var heartShape = new THREE.Shape();
@@ -192,7 +205,6 @@ wing2.rotation.x = 1.37;
 wing2.rotation.z = 2.28;
 wing2.position.x = 0.30;
 
-
 var spriteMaterial = new THREE.SpriteMaterial({ 
   map: loader.load( 'assets/textures/glow.png' ), 
   useScreenCoordinates: false, 
@@ -211,26 +223,30 @@ navi = new THREE.Mesh( navi_g, navi_m);
 navi.add(sprite);
 navi.add(wing);
 navi.add(wing2);
-
+navi.rotation.x = 0;
+navi.rotation.y = 0.5;
+navi.rotation.z = 0.3;
 scene.add(navi);
 
+var navi_sound = new THREE.PositionalAudio( listener );
+audioLoader.load( 'assets/sounds/navi/OOT_Navi_Listen1.wav', function( buffer ) {
+  navi_sound.setBuffer( buffer );
+  navi_sound.setRefDistance( 0.03 );
+  navi_sound.setVolume(100);
+  //navi_sound.setLoop(true);
+  navi_sound.play();
+});
+navi.add( navi_sound );
 
-///////////////////
-// LIGHT  //
-///////////////////
-var ambientLight = new THREE.AmbientLight( 0x444444 );
-//var ambient = new THREE.AmbientLight( 0x101030 );
-scene.add( ambientLight );
-
-var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-directionalLight.position.set( 0, 0, 1 ).normalize();
-//directionalLight.position = camera.position;
-//directionalLight.position = navi.position;
-scene.add( directionalLight );
-
-var pointLight = new THREE.PointLight(0xffffff);
-scene.add( pointLight );
-
+var rdm_shift = 0;
+setInterval(function() {
+  //rdm_shift = Math.random() - 0.2;
+  rdm_shift = Math.random();
+  //console.log(rdm_shift);
+}, 3000);
+setInterval(function() {
+  navi_sound.play();
+}, 18000);
 
 
 // Request animation frame loop function
@@ -242,11 +258,9 @@ function animate(timestamp) {
 
   mesh1.rotation.y += delta * 0.0006;
 
-  var rdm_shift = Math.random();
-  var rdm_shift = 0;
-  var navi_shift = camera.position.x - rdm_shift;
-  navi.position.set(navi_shift, camera.position.y + 2, camera.position.z - 4);
-  //navi.position.x += 1.2;
+  var navi_shiftx = camera.position.x - 1.3 - rdm_shift;
+  var navi_shifty = camera.position.y + 2 - rdm_shift;
+  navi.position.set(navi_shiftx, navi_shifty, camera.position.z - 4);
 
   //controls.update();
   vrControls.update();
