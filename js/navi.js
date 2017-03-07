@@ -55,19 +55,21 @@ audioLoader.load( 'https://sjcobb.github.io/lake-hylia/assets/navi/OOT_Navi_List
   navi_sound.setRefDistance( 0.03 );
   navi_sound.setVolume(100);
   //navi_sound.setLoop(true);
-  navi_sound.play();
+  //navi_sound.play();
 });
 navi.add( navi_sound );
 
 var rdm_shift = 0;
 setInterval(function() {
-  //rdm_shift = Math.random() - 0.2;
   rdm_shift = Math.random();
-  //console.log(rdm_shift);
 }, 3000);
-setInterval(function() {
+
+setTimeout(function() {
   navi_sound.play();
-}, 27000);
+  setInterval(function() {
+    navi_sound.play();
+  }, 27000);
+}, 6000);
 
 function renderNavi() {
   var navi_shiftx = camera.position.x - 1.3 - rdm_shift;
