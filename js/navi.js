@@ -67,7 +67,7 @@ setInterval(function() {
 }, 3000);
 setInterval(function() {
   navi_sound.play();
-}, 18000);
+}, 27000);
 
 function renderNavi() {
   var navi_shiftx = camera.position.x - 1.3 - rdm_shift;
