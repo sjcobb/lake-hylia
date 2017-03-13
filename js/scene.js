@@ -24,8 +24,8 @@ var epsilon = speed / 60;
 //var camera = new THREE.PerspectiveCamera(1000, window.innerWidth / window.innerHeight, 0.1, 10000); //upside down
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
 
-var controls = new THREE.VRControls(camera);
-controls.standing = true; //raise user above ground
+//var controls = new THREE.VRControls(camera);
+//controls.standing = true; //raise user above ground
 
 /*** VR Controls ***/
 // Create VRControls in addition to FirstPersonVRControls.
