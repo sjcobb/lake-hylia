@@ -178,315 +178,13 @@ Tree.prototype = new Object3D();
 Tree.prototype.constructor = Tree;
 
 /////////////////////////////////////////////////////////////
-// Question box
-/////////////////////////////////////////////////////////////
-function SpellBook() {
-    Object3D.call(this);
-    this.remove = 0;
-    this.id;
-    this.speed = 0;
-    SpellBook.prototype.type = "spellbook";
-
-    SpellBook.prototype.Remove = function() {
-	scene.remove(this.mesh);
-	// delete collision_objects[this.id];
-	this.remove = 1;
-    };
-
-    SpellBook.prototype.Hit = function(dmg, i, player) {
-	if(this.remove) {
-	    return;
-	}
-	scene.remove(this.mesh);
-	this.remove =  1;
-	collision_objects.splice(i, 1);
-	net.send_SpellBookHit(this.id);
-    };
-
-    SpellBook.prototype.Create = function(x, y, z, id, s) {
-	this.speed = 3;
-	this.id = id;
-	var type = Math.round(1+Math.random()*6);
-	var texture = THREE.ImageUtils.loadTexture( "models/Crates/book/texture"+type+".jpg" );
-	texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-	texture.repeat.set( 1, 1 );
-	var object = modelLoader.GetModel('book');
-	var material = new THREE.MeshPhongMaterial( { map: texture, 
-						      emissive: 0x888888,
-						      color: 0x888888,
-						      specular: 0x888888,
-						      ambient: 0x888888,
-						      shininess: 2} );
-	object.material = material;
-
-	object.position.set( x, y, z );
-	object.scale.set(s,s,s);
-	object.rotation.set(0,  Math.random()*Math.PI, 0);
-	//object.castShadow = true;
-	//object.receiveShadow = true;
-	this.mesh = object;
-	soundLoader.PlaySound("swoosh", this.mesh.position, 1000);
-	CreateBoundingBox(this);
-	scene.add(object);
-	
-	// Creation effect
-	var vector = new THREE.Vector3(0, 0, 0);
-	var particleGroup = new SPE.Group({
-            texture: THREE.ImageUtils.loadTexture('assets/wiz/star.png'),
-            maxAge: 5
-        });
-	
-        var emitter = new SPE.Emitter({
-	    position: new THREE.Vector3(0, 0, 0),
-            positionSpread: new THREE.Vector3( 0, 0, 0 ),
-
-            acceleration: new THREE.Vector3(0, 10, 0),
-            accelerationSpread: new THREE.Vector3( 10, 0, 10 ),
-
-            velocity: new THREE.Vector3(0, 15, 0),
-            velocitySpread: new THREE.Vector3(10, 7.5, 10),
-
-            colorStart: new THREE.Color('black'),
-            colorEnd: new THREE.Color('white'),
-
-	    duration: 1.5,
-            sizeStart: 4,
-            sizeEnd: 1,
-	    speed: 10,
-            particleCount: 1000
-        });
-
-        particleGroup.addEmitter( emitter );
-	this.mesh.add(particleGroup.mesh);
-	objects.push(particleGroup);
-    };
-
-    SpellBook.prototype.Draw = function(time, delta, index) {
-	this.mesh.rotation.y = (time/this.speed);
-    };
-}
-SpellBook.prototype = new Object3D();
-SpellBook.prototype.constructor = SpellBook;
-
-/////////////////////////////////////////////////////////////
-// Potions
-/////////////////////////////////////////////////////////////
-function Potion() {
-    Object3D.call(this);
-    this.remove = 0;
-    this.id;
-    this.speed = 0;
-    this.particle = undefined;
-
-    Potion.prototype.Remove = function() {
-	scene.remove(this.mesh);
-	// delete collision_objects[this.id];
-	this.remove = 1;
-    };
-
-    Potion.prototype.Hit = function(dmg, i, player) {
-	if(this.remove) {
-	    return;
-	}
-	this.particle.destroy();
-	scene.remove(this.mesh);
-	this.remove =  1;
-	collision_objects.splice(i, 1);
-	if(this.type == "health") {
-	    net.send_HealthPotionHit(this.id);
-	} else if(this.type == "power") {
-	    net.send_PowerPotionHit(this.id);	    
-	}
-    };
-
-    Potion.prototype.Create = function(x, y, z, id, s, type) {
-	this.type = type; // power, health
-	this.speed = 3+Math.random()*3;
-	this.id = id;
-
-	var object;
-	var color;
-	var offset;
-	if(type == "health") {
-	    object = modelLoader.GetModel('health');
-	    color = "red";
-	    offset = 1;
-	} else if(type == "power") {
-	    object = modelLoader.GetModel('power');
-	    color = "blue";
-	    offset = 0;
-	}
-
-//	this.animation = new THREE.MorphAnimation( object );
-//	this.animation.play();
-	    
-	object.position.set( x, y, z );
-	object.scale.set(s,s,s);
-	object.rotation.set(0,  0, Math.PI/6);
-	//object.castShadow = true;
-	//object.receiveShadow = true;
-	this.mesh = object;
-	soundLoader.PlaySound("swoosh", this.mesh.position, 1000);
-	CreateBoundingBox(this);
-	scene.add(object);
-
-	// Effect
-	var particleGroup = new SPE.Group({
-            texture: THREE.ImageUtils.loadTexture('assets/wiz/smokeparticle.png'),
-            maxAge: 1
-        });
-
-        var emitter = new SPE.Emitter({
-	    position: new THREE.Vector3(0, offset, 0),
-            positionSpread: new THREE.Vector3( 0, 0, 0 ),
-	    
-            acceleration: new THREE.Vector3(0, -3, 0),
-            accelerationSpread: new THREE.Vector3( 3, 0, 3 ),
-	    
-            velocity: new THREE.Vector3(0, 1, 0),
-            velocitySpread: new THREE.Vector3(2, 7.5, 5),
-	    
-            colorStart: new THREE.Color(color),
-            colorEnd: new THREE.Color(color),
-	    
-            sizeStart: 1,
-            sizeEnd: 5,
-            particleCount: 150
-        });
-	
-        particleGroup.addEmitter( emitter );
-	objects.push(particleGroup);
-	this.particle = particleGroup;
-	this.mesh.add( particleGroup.mesh );
-
-	/*
-	// Creation effect
-	var burn = new ParticleEngine();
-	var vector = new THREE.Vector3(0,0,0);
-	burn.setValues(
-	    {
-		positionStyle    : Type.SPHERE,
-		positionBase   : new THREE.Vector3(vector.x,
-						   vector.y+(2.5-Math.random()*5),
-						   vector.z),
-		positionRadius : 2,
-		
-		velocityStyle  : Type.CUBE,
-		velocityBase   : new THREE.Vector3(0,10,0),
-		velocitySpread : new THREE.Vector3(5,0,5),
-		
-		particleTexture : THREE.ImageUtils.loadTexture( 'assets/wiz/smokeparticle.png' ),
-		
-		sizeTween    : new Tween( [0, 0.3, 1.2], [0.1, 15, 1] ),
-		opacityTween : new Tween( [0.9, 1.5], [1, 0] ),
-		colorBase    : new THREE.Vector3(1.5, 0.2, 1.4),
-		colorTween   : new Tween( [0.5, 1.0], [ new THREE.Vector3(0.42, 1.0, 1.5), new THREE.Vector3(0.25, 1.4, 1) ] ),
-		blendStyle : THREE.AdditiveBlending,  
-		
-		speedBase     : 0.5,
-		speedSpread   : 2,
-
-		particlesPerSecond : 80,
-		particleDeathAge   : 0.5,		
-		emitterDeathAge    : 1.5
-
-	    });
-	burn.initialize(this.mesh);
-	objects.push(burn);
-*/
-    };
-
-    Potion.prototype.Draw = function(time, delta, index) {
-	this.mesh.rotation.y = (time/this.speed);
-//	if (this.animation) {
-//	    this.animation.update(delta);
-//	}
-
-    };
-}
-Potion.prototype = new Object3D();
-Potion.prototype.constructor = Potion;
-
-/////////////////////////////////////////////////////////////
 // Clouds
 /////////////////////////////////////////////////////////////
 function Cloud() {
     Object3D.call(this);
 
     Cloud.prototype.Create = function(x ,y ,z, s, scene) {
-/*
-	var group = new THREE.Object3D();
-	var combined = new THREE.Geometry();
-	var texture = THREE.ImageUtils.loadTexture( "assets/wiz/cloud.png" );
-	texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-	texture.repeat.set(1, 1);
-	var cloud_material = new THREE.MeshLambertMaterial( { color: 0xFFFFFF, ambient: 0x000000 } );
-	for(var i = 0; i < 4; i++) {
-	    for(var n = 0; n < 3; n++) {
-		var size1 = Math.random()*15+5;
-		var size2 = Math.random()*15+7;
-		var object = new THREE.Mesh( new THREE.SphereGeometry( size1, size1, 5));
-		object.position.set(Math.random()*15*i, Math.random()*7, Math.random()*20*n);
-		object.castShadow = true;
-		//group.add(object);
-		var object = new THREE.Mesh( new THREE.SphereGeometry( size2, size2, 5 ));
-		object.position.set(Math.random()*15*i, Math.random()*7, Math.random()*20*n);
-		object.castShadow = true;
-		//group.add(object);
-		THREE.GeometryUtils.merge(combined, object);
-	    }
-	}
-	var mesh = new THREE.Mesh(combined, cloud_material);
 
-	//group.scale.set(s, s, s);
-	//group.position.set(x, y ,z);
-	mesh.scale.set(s, s, s);
-	mesh.position.set(x, y, z);
-*/
-	
-	// Create Snow cloud
-/*
-	if(Math.random()*10 < 7) {
-	    var engine = new ParticleEngine();
-
-	    engine.setValues(
-		{positionStyle    : Type.CUBE,
-		 positionBase     : new THREE.Vector3(mesh.position.x, mesh.position.y, mesh.position.z), //new THREE.Vector3( 0, 0, 0 ),
-		 positionSpread   : new THREE.Vector3( 200, 0, 200 ),
-		 positionRadius : 0.1,
-		 
-		 velocityStyle    : Type.CUBE,
-		 velocityBase     : new THREE.Vector3( 0, -300, 0 ),
-		 velocitySpread   : new THREE.Vector3( 150, 20, 150 ), 
-		 accelerationBase : new THREE.Vector3( 0, -5,0 ),
-
-		 sizeTween    : new Tween( [0, 0.25], [1, 10] ),
-		 colorBase   : new THREE.Vector3(0.66, 1.0, 0.9), // H,S,L
-		 opacityTween : new Tween( [2, 3], [0.8, 0] ),
-		 blendStyle   : THREE.AdditiveBlending,
-
-		 angleBase               : 0,
-		 angleSpread             : 720,
-		 angleVelocityBase       :  0,
-		 angleVelocitySpread     : 60,
-		 
-		 particleTexture : THREE.ImageUtils.loadTexture( 'assets/wiz/snowflake.png' ),
-		 
-		 particlesPerSecond : Math.random()*50+100,
-		 particleDeathAge   : 10.5,
-		 // emitterDeathAge    : 60
-		});
-
-	    //this.engine.positionBase.set(x, y, z);
-	    engine.initialize();
-	    this.engine = engine;
-	}
-*/
-	//mesh.castShadow = true;
-	//this.mesh = group;
-
-//	var type = Math.round((1+Math.random()*1));
-//	console.log("LOAD: cloud"+type);
 	var mesh = modelLoader.GetModel('cloud');
 	mesh.scale.set(25+Math.random()*40, 25+Math.random()*20, 25+Math.random()*100);
 	mesh.rotation.set(0, Math.PI/2, 0);
@@ -506,19 +204,7 @@ function Cloud() {
 	    this.mesh.position.x = Math.random()*4000-1500;
 	    this.mesh.position.y = 465+Math.random()*400;
 	}
-/*
-	if(this.engine != undefined) {
-	    this.engine.positionBase.z = this.mesh.position.z;
-	    this.engine.positionBase.x = this.mesh.position.x;
-	    this.engine.positionBase.y = this.mesh.position.y;
-	    this.engine.update(delta * 0.5);
-	    if(this.mesh.position.z > 1000 || this.mesh.position.z < -1000) {
-		this.engine.emitterAlive =false;
-	    } else {
-		this.engine.emitterAlive = true;
-	    }
-	}
-*/
+
     };
 }
 Cloud.prototype = new Object3D();
@@ -576,32 +262,7 @@ function Sun() {
 		transparent: true
 	    }   );
 
-/*	
-	var sunEngine = new ParticleEngine();
 
-	sunEngine.setValues(
-	    {
-		positionStyle  : Type.SPHERE,
-		positionBase   : new THREE.Vector3(0, 200, 0),
-		positionRadius : 20, // 20
-
-		sizeTween    : new Tween( [0, 0.4], [1, 450] ), // 250
-		opacityTween : new Tween( [0.7, 1], [1, 0] ),
-		colorBase    : new THREE.Vector3(0.02, 1, 0.4),
-		blendStyle   : THREE.AdditiveBlending,  
-
-		velocityStyle : Type.SPHERE,
-		speedBase     : 40,
-		speedSpread   : 8,
-	  
-		particleTexture : THREE.ImageUtils.loadTexture( 'assets/wiz/smokeparticle.png' ),
-		
-		particlesPerSecond : 260,
-		particleDeathAge: 10.7,
-	    });
-	sunEngine.initialize();
-	this.sunEngine = sunEngine;
-*/
     };
 
 
@@ -691,7 +352,7 @@ MarketHouse.prototype = new Object3D();
 MarketHouse.prototype.constructor = MarketHouse;
 
 /////////////////////////////////////////////////////////////
-// Market house
+// Dock house
 /////////////////////////////////////////////////////////////
 function DockHouse() {
     Object3D.call(this);
@@ -707,46 +368,6 @@ function DockHouse() {
 }
 DockHouse.prototype = new Object3D();
 DockHouse.prototype.constructor = DockHouse;
-
-/////////////////////////////////////////////////////////////
-// RoadHouse
-/////////////////////////////////////////////////////////////
-function RoadHouse() {
-    Object3D.call(this);
-    
-    RoadHouse.prototype.Create = function(x, y, z, scale) {
-	var object = modelLoader.GetModel("roadhouse");
-	this.mesh = object;
-	CreateBoundingBox(this);
-	console.log("WIDTH: "+200*this.bsize_x);
-	object.position.set(x-(this.bsize_x*scale),y,z+(this.bsize_z*scale));
-	object.rotation.set(0, Math.random()*Math.PI, 0);
-	object.scale.set(scale, scale, scale);
-	scene.add(object);
-    };
-
-}
-RoadHouse.prototype = new Object3D();
-RoadHouse.prototype.constructor = RoadHouse;
-
-
-/////////////////////////////////////////////////////////////
-// Lamp
-/////////////////////////////////////////////////////////////
-function Lamp() {
-    Object3D.call(this);
-    
-    Lamp.prototype.Create = function(x, y, z, scale) {
-	var object = modelLoader.GetModel("lamp");
-	object.position.set(x,y,z);
-	object.rotation.set(0, Math.random()*Math.PI, 0);
-	object.scale.set(scale, scale, scale);
-	scene.add(object);
-    };
-
-}
-Lamp.prototype = new Object3D();
-Lamp.prototype.constructor = Lamp;
 
 /////////////////////////////////////////////////////////////
 // Flower
@@ -765,33 +386,6 @@ function Flower() {
 }
 Flower.prototype = new Object3D();
 Flower.prototype.constructor = Flower;
-
-/////////////////////////////////////////////////////////////
-// BigBox
-/////////////////////////////////////////////////////////////
-function BigBox() {
-    Object3D.call(this);
-    
-    BigBox.prototype.Create = function(w,h, d, x, y, z, s, scene) {
-	var texture = THREE.ImageUtils.loadTexture( "assets/wiz/bigbox1.png" );
-	texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-	texture.repeat.set( 1, 1 );
-	var base_material = new THREE.MeshLambertMaterial( { color: 0x996600, map: texture} ); // 996600
-	var object = new THREE.Mesh( new THREE.BoxGeometry(w, h, d ), base_material);
-	//object.castShadow = true;
-//	object.receiveShadow = true;
-	object.scale.set(s, s, s);
-	object.position.set(x, y + (h*s)/2 ,z);
-	this.mesh = object;
-	scene.add(object);
-    };
-
-    BigBox.prototype.Draw = function(time) {
-
-    };
-}
-BigBox.prototype = new Object3D();
-BigBox.prototype.constructor = BigBox;
 
 /////////////////////////////////////////////////////////////
 // Terrain
