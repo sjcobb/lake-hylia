@@ -1,8 +1,3 @@
-/////////////////////////////////////////////////////////////
-// Author: Nergal
-// FROM WIZARDWARZ
-// Date: 2013-11-27
-/////////////////////////////////////////////////////////////
 "use strict";
 /////////////////////////////////////////////////////////////
 // Objects base 'class'
@@ -44,26 +39,27 @@ function Water() {
 	geometry.computeFaceNormals();
 	geometry.computeVertexNormals();
 
-	var texture2 = THREE.ImageUtils.loadTexture( "textures/water4.jpg" );
+	var texture2 = THREE.ImageUtils.loadTexture( "assets/wiz/water4.jpg" );
 	texture2.wrapS = texture2.wrapT = THREE.RepeatWrapping;
 	texture2.repeat.set( 32, 32 );
 	
 	// two types of water
-	//var material = new THREE.MeshBasicMaterial( { color: 0x00CCFF, map: texture, transparent: true, opacity: 0.3} );
-	var material2 = new THREE.MeshPhongMaterial( { color: 0x00CCFF, 
-						       map: texture2,
-						       transparent: true, 
-						       opacity: 0.4, 
-						       shininess: 50.0,
-						       ambient: 0x555555,
-						       emissive: 0x555555,
-						       specular: 0x000000,
-						       depthWrite: false,
-						       depthTest: true,
-						    } );
+	var material2 = new THREE.MeshPhongMaterial( { 
+		color: 0x00CCFF, 
+		map: texture2,
+		transparent: true, 
+		opacity: 0.4, 
+		shininess: 50.0,
+		ambient: 0x555555,
+		emissive: 0x555555,
+		specular: 0x000000,
+		depthWrite: false,
+		depthTest: true,
+	} );
 
 	var mesh = new THREE.Mesh(geometry, material2);
-	mesh.position.set(0,60,0);
+	//mesh.position.set(0, 10, 0);
+	mesh.position.set(0, 60, 0);
 
 	this.mesh = mesh;
 	scene.add(this.mesh);
@@ -101,7 +97,7 @@ function Tree() {
 	//this.burns = 1;
 	var vector = new THREE.Vector3(0, 0, 0);
 	var particleGroup = new SPE.Group({
-            texture: THREE.ImageUtils.loadTexture('textures/star.png'),
+            texture: THREE.ImageUtils.loadTexture('assets/wiz/star.png'),
             maxAge: 1
         });
 	
@@ -141,7 +137,7 @@ function Tree() {
 	this.id = id;
 	
 	// Create leaves
-	var texture = THREE.ImageUtils.loadTexture( "textures/leaves2.png" );
+	var texture = THREE.ImageUtils.loadTexture( "assets/wiz/leaves2.png" );
 	texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 	texture.repeat.set( 1, 1 );
 	var tree_material = new THREE.MeshLambertMaterial( { color: 0xFFFFFF, ambient: 0x00FFAA, map: texture } ); // 336633
@@ -158,7 +154,7 @@ function Tree() {
 	group.add(mesh);
 
 	// Create tree-base
-	var texture = THREE.ImageUtils.loadTexture( "textures/wood1.jpg" );
+	var texture = THREE.ImageUtils.loadTexture( "assets/wiz/wood1.jpg" );
 	texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 	texture.repeat.set( 2, 2 );
 	var base_material = new THREE.MeshLambertMaterial( { color: 0x996600, map: texture} ); // 996600
@@ -236,7 +232,7 @@ function SpellBook() {
 	// Creation effect
 	var vector = new THREE.Vector3(0, 0, 0);
 	var particleGroup = new SPE.Group({
-            texture: THREE.ImageUtils.loadTexture('textures/star.png'),
+            texture: THREE.ImageUtils.loadTexture('assets/wiz/star.png'),
             maxAge: 5
         });
 	
@@ -336,7 +332,7 @@ function Potion() {
 
 	// Effect
 	var particleGroup = new SPE.Group({
-            texture: THREE.ImageUtils.loadTexture('textures/smokeparticle.png'),
+            texture: THREE.ImageUtils.loadTexture('assets/wiz/smokeparticle.png'),
             maxAge: 1
         });
 
@@ -379,7 +375,7 @@ function Potion() {
 		velocityBase   : new THREE.Vector3(0,10,0),
 		velocitySpread : new THREE.Vector3(5,0,5),
 		
-		particleTexture : THREE.ImageUtils.loadTexture( 'textures/smokeparticle.png' ),
+		particleTexture : THREE.ImageUtils.loadTexture( 'assets/wiz/smokeparticle.png' ),
 		
 		sizeTween    : new Tween( [0, 0.3, 1.2], [0.1, 15, 1] ),
 		opacityTween : new Tween( [0.9, 1.5], [1, 0] ),
@@ -421,7 +417,7 @@ function Cloud() {
 /*
 	var group = new THREE.Object3D();
 	var combined = new THREE.Geometry();
-	var texture = THREE.ImageUtils.loadTexture( "textures/cloud.png" );
+	var texture = THREE.ImageUtils.loadTexture( "assets/wiz/cloud.png" );
 	texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 	texture.repeat.set(1, 1);
 	var cloud_material = new THREE.MeshLambertMaterial( { color: 0xFFFFFF, ambient: 0x000000 } );
@@ -474,7 +470,7 @@ function Cloud() {
 		 angleVelocityBase       :  0,
 		 angleVelocitySpread     : 60,
 		 
-		 particleTexture : THREE.ImageUtils.loadTexture( 'textures/snowflake.png' ),
+		 particleTexture : THREE.ImageUtils.loadTexture( 'assets/wiz/snowflake.png' ),
 		 
 		 particlesPerSecond : Math.random()*50+100,
 		 particleDeathAge   : 10.5,
@@ -598,7 +594,7 @@ function Sun() {
 		speedBase     : 40,
 		speedSpread   : 8,
 	  
-		particleTexture : THREE.ImageUtils.loadTexture( 'textures/smokeparticle.png' ),
+		particleTexture : THREE.ImageUtils.loadTexture( 'assets/wiz/smokeparticle.png' ),
 		
 		particlesPerSecond : 260,
 		particleDeathAge: 10.7,
@@ -777,7 +773,7 @@ function BigBox() {
     Object3D.call(this);
     
     BigBox.prototype.Create = function(w,h, d, x, y, z, s, scene) {
-	var texture = THREE.ImageUtils.loadTexture( "textures/bigbox1.png" );
+	var texture = THREE.ImageUtils.loadTexture( "assets/wiz/bigbox1.png" );
 	texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 	texture.repeat.set( 1, 1 );
 	var base_material = new THREE.MeshLambertMaterial( { color: 0x996600, map: texture} ); // 996600
@@ -841,16 +837,16 @@ function Terrain() {
 	oceanTexture.wrapS = oceanTexture.wrapT = THREE.RepeatWrapping; 
 	
 	//var sandyTexture = new THREE.ImageUtils.loadTexture( 'images/sand-512.jpg' );
-	var sandyTexture = new THREE.ImageUtils.loadTexture( 'textures/mario/sand2.png' );
+	var sandyTexture = new THREE.ImageUtils.loadTexture( 'assets/wiz/mario/sand2.png' );
 	sandyTexture.wrapS = sandyTexture.wrapT = THREE.RepeatWrapping; 
 	
 	//var grassTexture = new THREE.ImageUtils.loadTexture( 'images/grass-512.jpg' );
-	//var grassTexture = new THREE.ImageUtils.loadTexture( 'textures/grass_6.png' );
-	var grassTexture = new THREE.ImageUtils.loadTexture( 'textures/mario/grass.png' );
+	//var grassTexture = new THREE.ImageUtils.loadTexture( 'assets/wiz/grass_6.png' );
+	var grassTexture = new THREE.ImageUtils.loadTexture( 'assets/wiz/mario/grass.png' );
 	grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping; 
 	
 	//var rockyTexture = new THREE.ImageUtils.loadTexture( 'images/rock-512.jpg' );
-	var rockyTexture = new THREE.ImageUtils.loadTexture( 'textures/rock_n1.jpg' );
+	var rockyTexture = new THREE.ImageUtils.loadTexture( 'assets/wiz/rock_n1.jpg' );
 	rockyTexture.wrapS = rockyTexture.wrapT = THREE.RepeatWrapping; 
 	
 	var snowyTexture = new THREE.ImageUtils.loadTexture( 'images/snow-512.jpg' );
@@ -915,16 +911,16 @@ function Terrain() {
 	oceanTexture.wrapS = oceanTexture.wrapT = THREE.RepeatWrapping; 
 	
 	//var sandyTexture = new THREE.ImageUtils.loadTexture( 'images/sand-512.jpg' );
-	var sandyTexture = new THREE.ImageUtils.loadTexture( 'textures/mario/sand1.png' );
+	var sandyTexture = new THREE.ImageUtils.loadTexture( 'assets/wiz/mario/sand1.png' );
 	sandyTexture.wrapS = sandyTexture.wrapT = THREE.RepeatWrapping; 
 	
 	//var grassTexture = new THREE.ImageUtils.loadTexture( 'images/grass-512.jpg' );
-	//var grassTexture = new THREE.ImageUtils.loadTexture( 'textures/grass_6.png' );
-	var grassTexture = new THREE.ImageUtils.loadTexture( 'textures/mario/grass.png' );
+	//var grassTexture = new THREE.ImageUtils.loadTexture( 'assets/wiz/grass_6.png' );
+	var grassTexture = new THREE.ImageUtils.loadTexture( 'assets/wiz/mario/grass.png' );
 	grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping; 
 	
 	//var rockyTexture = new THREE.ImageUtils.loadTexture( 'images/rock-512.jpg' );
-	var rockyTexture = new THREE.ImageUtils.loadTexture( 'textures/rock_n1.jpg' );
+	var rockyTexture = new THREE.ImageUtils.loadTexture( 'assets/wiz/rock_n1.jpg' );
 	rockyTexture.wrapS = rockyTexture.wrapT = THREE.RepeatWrapping; 
 	
 	var snowyTexture = new THREE.ImageUtils.loadTexture( 'images/snow-512.jpg' );

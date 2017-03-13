@@ -1,65 +1,159 @@
 <!DOCTYPE html>
 
 <html lang="en">
-<head>
-  <title>Lake Hylia (in development)</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="viewmode" content="projection=stereo">
-  <style>
-    body {
-      width: 100%;
-      height: 100%;
-      background-color: #2247B5;
-      color: #fff;
-      margin: 0px;
-      padding: 0;
-      overflow: hidden;
+  <head>
+    <title>Lake Hylia (in development)</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="viewmode" content="projection=stereo">
+    <style>
+      body {
+        width: 100%;
+        height: 100%;
+        background-color: #2247B5;
+        color: #fff;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="container"></div>
+  </body>
+
+  <script>
+    /* debug parameters */
+    WebVRConfig = {
+      BUFFER_SCALE: 0.5, // default: 1.0
+    };
+  </script>
+
+  <script src="js/lib/es6-promise.js"></script>
+  <script src="js/lib/three.min.js"></script>
+  <!-- <script src="js/lib/renderers/CSS3DRenderer.js"></script> -->
+  <script src="js/lib/VRControls.js"></script>
+  <script src="js/vr-controls.js"></script>
+  <script src="js/lib/VREffect.js"></script>
+  <script src="js/lib/webvr-polyfill.js"></script>
+  <script src="build/webvr-manager.js"></script>
+
+  <!-- SHADERS -->
+  <script id="sunVertexShader" type="x-shader/x-vertex">
+    varying vec3 vNormal;
+    void main() 
+    {
+    vNormal = normalize( normalMatrix * normal );
+    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
     }
-  </style>
-</head>
+  </script>
+  
+  <script id="sunFragmentShader" type="x-shader/x-vertex"> 
+    varying vec3 vNormal;
+    void main() 
+    {
+    float intensity = pow( 0.7 - dot( vNormal, vec3( 0.0, 0.0, 1.0 ) ), 4.0 ); 
+/*      gl_FragColor = vec4( 0.0, 0.273, 0.925, 0.008 ) * intensity; */
+    gl_FragColor = vec4(0.573 , 0.225, 0.008, 0.7 ) * intensity;
+    }
+  </script>
 
-<body>
-  <div id="container"></div>
-</body>
+  <script id="vertexWaterShader" type="x-shader/x-vertex">
+    varying vec2 vUv;
+    void main() 
+    { 
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    }
+  </script>
+  <script id="vertexShader" type="x-shader/x-vertex">
+    uniform vec3 viewVector;
+    uniform float c;
+    uniform float p;
+    varying float intensity;
+    void main() 
+    {
+    vec3 vNormal = normalize( normalMatrix * normal );
+    vec3 vNormel = normalize( normalMatrix * viewVector );
+    
+    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); 
+    intensity = pow( c - dot(vNormal, vNormel), p );
+    }
+  </script>
+  <script id="waterShader" type="x-shader/x-vertex"> 
+    uniform sampler2D baseTexture;
+    uniform float baseSpeed;
+    uniform sampler2D noiseTexture;
+    uniform float noiseScale;
+    uniform float alpha;
+    uniform float time;
+    
+    varying vec2 vUv;
+    void main() 
+    {
+    vec2 uvTimeShift = vUv + vec2( -0.7, 1.5 ) * time * baseSpeed;  
+    vec4 noiseGeneratorTimeShift = texture2D( noiseTexture, uvTimeShift );
+    vec2 uvNoiseTimeShift = vUv + noiseScale * vec2( noiseGeneratorTimeShift.r, noiseGeneratorTimeShift.b );
+    vec4 baseColor = texture2D( baseTexture, uvNoiseTimeShift );
+    
+    baseColor.a = alpha;
+    gl_FragColor = baseColor;
+    }  
+  </script>
+  <script id="terrainVertexShader" type="x-shader/x-vertex">
+    uniform sampler2D bumpTexture;
+    uniform float bumpScale;
 
-<script>
-  /*
-   * Debug parameters.
-   */
-  WebVRConfig = {
-    /**
-     * webvr-polyfill configuration
-     */
-    BUFFER_SCALE: 0.5, // default: 1.0
-  };
-</script>
+    varying float vAmount;
+    varying vec2 vUV;
 
-<!-- A polyfill for Promises. Needed for IE and Edge. -->
-<script src="js/lib/es6-promise.js"></script>
+    void main() 
+    { 
+      vUV = uv;
+      vec4 bumpData = texture2D( bumpTexture, uv );
+      
+      vAmount = bumpData.r; // assuming map is grayscale it doesn't matter if you use r, g, or b.
+      
+      // move the position along the normal
+        vec3 newPosition = position + normal * bumpScale * vAmount;
+      
+      gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
+    }
+  </script>
+  <script id="terrainFragmentShader" type="x-shader/x-vertex"> 
+    uniform sampler2D oceanTexture; 
+    uniform sampler2D sandyTexture;
+    uniform sampler2D grassTexture;
+    uniform sampler2D rockyTexture;
+    uniform sampler2D snowyTexture;
 
-<!-- three.js 3d library -->
-<script src="js/lib/three.min.js"></script>
+    varying vec2 vUV;
 
-<script src="js/inventory.js"></script>
+    varying float vAmount;
 
-<script src="js/lib/renderers/CSS3DRenderer.js"></script>
+    void main() 
+    {
+    /*
+    vec4 water = (smoothstep(0.0, 0.25, vAmount) - smoothstep(0.15, 0.35, vAmount)) * texture2D( oceanTexture, vUV * 10.0 ); 
+    vec4 sandy = (smoothstep(0.20, 0.34, vAmount) - smoothstep(0.35, 0.50, vAmount)) * texture2D( sandyTexture, vUV * 10.0 );
+    */
+      vec4 water = (smoothstep(0.0, 0.12, vAmount) - smoothstep(0.15, 0.35, vAmount)) * texture2D( oceanTexture, vUV * 10.0 ); 
+      vec4 sandy = (smoothstep(0.15, 0.34, vAmount) - smoothstep(0.35, 0.50, vAmount)) * texture2D( sandyTexture, vUV * 10.0 );
+            vec4 grass = (smoothstep(0.30, 0.50, vAmount) - smoothstep(0.70, 0.80, vAmount)) * texture2D( grassTexture, vUV * 10.0 );
+      vec4 rocky = (smoothstep(0.31, 0.85, vAmount)) * texture2D( rockyTexture, vUV * 10.0 ); 
+      gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0) + water + sandy + grass + rocky; // + snowy, 1.0); 
+    }  
+  </script>
 
-<script src="js/lib/VRControls.js"></script>
-<script src="js/vr-controls.js"></script>
-<script src="js/lib/VREffect.js"></script>
-<script src="js/lib/webvr-polyfill.js"></script>
-<script src="build/webvr-manager.js"></script>
-
-
-<script src="js/custom.js"></script>
-
-<script src="js/controls.js"></script>
-<script src="js/scene.js"></script>
-<script src="js/woods.js"></script>
-<script src="https://lost-woods.com/js/navi.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/inventory.js"></script>
+  <script src="js/objects.js"></script>
+  <script src="js/scene.js"></script>
+  <script src="js/woods.js"></script>
+  <script src="https://lost-woods.com/js/navi.js"></script>
 
 </html>

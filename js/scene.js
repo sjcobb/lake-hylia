@@ -2,7 +2,6 @@
  *** CUSTOM JS ***
 */
 
-
 var renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setPixelRatio(window.devicePixelRatio);
 
@@ -20,15 +19,14 @@ var clock = new THREE.Clock();
 var delta, shift = new THREE.Vector3(), shift_navi = new THREE.Vector3();
 var epsilon = speed / 60;
 
+var objects = [];
+var sun; 
+
 /*** CAMERA ***/
 //var camera = new THREE.PerspectiveCamera(1000, window.innerWidth / window.innerHeight, 0.1, 10000); //upside down
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
 
-//var controls = new THREE.VRControls(camera);
-//controls.standing = true; //raise user above ground
-
 /*** VR Controls ***/
-// Create VRControls in addition to FirstPersonVRControls.
 var vrControls = new THREE.VRControls(camera);
 //vrControls.standing = true;
 var fpVrControls = new THREE.FirstPersonVRControls(camera, scene);
@@ -74,13 +72,16 @@ function createMaterial( path ) {
 // Add a repeating grid as a skybox.
 var boxSize = 40;
 var loader = new THREE.TextureLoader();
-loader.load('img/box.png', onTextureLoaded);
+loader.load('assets/textures/grass.png', onTextureLoaded);
 
 function onTextureLoaded(texture) {
-  loadSkyBox();
+  //loadSkyBox();
 
   setupStage(); // For high end VR devices like Vive and Oculus, take into account the stage parameters provided.
 }
+
+
+//scene.fog = new THREE.FogExp2( 0x000000, 0.00025 );
 
 ///////////
 // FLOOR //
@@ -177,6 +178,16 @@ mesh1.add( sound1 );
 // OBJECTS //
 /////////////
 
+// Sun
+  sun = new Sun();
+  sun.Create(0,200,0, scene, renderer);
+  objects.push(sun);
+
+// Water
+  var water = new Water();
+  water.Create(scene);
+  objects.push(water);
+
 
 // Request animation frame loop function
 var lastRender = 0;
@@ -189,7 +200,6 @@ function animate(timestamp) {
 
   renderNavi();
 
-  //controls.update();
   vrControls.update();
   fpVrControls.update(timestamp);
 
@@ -207,9 +217,8 @@ function onResize(e) {
 }
 
 var vrDisplay;
-
-// Get the HMD, and if we're dealing with something that specifies stageParameters, rearrange the scene.
 function setupStage() {
+  //get the HMD and if we're dealing with something that specifies stageParameters, rearrange the scene.
   navigator.getVRDisplays().then(function(displays) {
     if (displays.length > 0) {
       vrDisplay = displays[0];
