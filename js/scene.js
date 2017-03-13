@@ -27,9 +27,9 @@ var sun;
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
 
 /*** VR Controls ***/
-var vrControls = new THREE.VRControls(camera);
-//vrControls.standing = true;
-var fpVrControls = new THREE.FirstPersonVRControls(camera, scene);
+var vrControls = new THREE.VRControls(camera); // js/lib/VRControls.js
+vrControls.standing = true; //does nothing
+var fpVrControls = new THREE.FirstPersonVRControls(camera, scene); //vr-controls.js
 fpVrControls.verticalMovement = true;
 fpVrControls.movementSpeed = 15;
 
@@ -157,7 +157,9 @@ camera.add( listener );
 
 // sound spheres
 var sphere = new THREE.SphereGeometry( 2.5, 4, 2 );
-material_sphere1 = new THREE.MeshPhongMaterial( { ambient: 0xffffff, color: 0x2247B5, shading: THREE.FlatShading, shininess: 0 } );
+//material_sphere1 = new THREE.MeshPhongMaterial( { ambient: 0xffffff, color: 0x2247B5, shading: THREE.FlatShading, shininess: 0 } );
+//material_sphere1 = new THREE.MeshPhongMaterial( { ambient: 0xffffff, color: 0x0000FF, shading: THREE.FlatShading, shininess: 30 } );
+material_sphere1 = new THREE.MeshPhongMaterial( { ambient: 0x3C49B1, color: 0x0000FF, shading: THREE.FlatShading, shininess: 30 } );
 
 var audioLoader = new THREE.AudioLoader();
 
@@ -179,14 +181,19 @@ mesh1.add( sound1 );
 /////////////
 
 // Sun
-  sun = new Sun();
-  sun.Create(0,200,0, scene, renderer);
-  objects.push(sun);
+sun = new Sun();
+sun.Create(0, 200, 0, scene, renderer);
+objects.push(sun);
 
 // Water
-  var water = new Water();
-  water.Create(scene);
-  objects.push(water);
+var water = new Water();
+water.Create(scene);
+objects.push(water);
+
+// Trees
+var tree = new Tree();
+tree.Create(0, 10, 0, scene, renderer);
+objects.push(tree);
 
 
 // Request animation frame loop function
