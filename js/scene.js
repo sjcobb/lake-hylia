@@ -75,7 +75,7 @@ var loader = new THREE.TextureLoader();
 loader.load('assets/textures/grass.png', onTextureLoaded);
 
 function onTextureLoaded(texture) {
-  //loadSkyBox();
+  loadSkyBox();
 
   setupStage(); // For high end VR devices like Vive and Oculus, take into account the stage parameters provided.
 }
@@ -180,23 +180,33 @@ mesh1.add( sound1 );
 // OBJECTS //
 /////////////
 
-// Sun
-sun = new Sun();
-sun.Create(0, 200, 0, scene, renderer);
-objects.push(sun);
+/* Sun */
+//sun = new Sun();
+//sun.Create(0, 200, 0, scene, renderer);
+//objects.push(sun);
 
-// Water
-var water = new Water();
-water.Create(scene);
-objects.push(water);
+/* Water */
+//var water = new Water();
+//water.Create(scene);
+//objects.push(water);
 
-// Trees
-var tree = new Tree();
-tree.Create(0, 10, 0, scene, renderer);
-objects.push(tree);
+/* Trees */
+//var tree = new Tree();
+//tree.Create(0, 10, 0, scene, renderer);
+//objects.push(tree);
 
+/* ITEMS */
+//var keyTexture = loader.load( 'https://lost-woods.com/assets/items/key-gold.png' );
+var bowTexture = loader.load( 'assets/items/bow.png' );
+var bowMaterial = new THREE.SpriteMaterial( { map: bowTexture, color: 0xffffff } );
+var bowSprite = new THREE.Sprite( bowMaterial );
+bowSprite.position.set(0, -2, -14);
+bowSprite.scale.set(3, 3, 3);
+scene.add( bowSprite );
 
-// Request animation frame loop function
+////////////////
+// ANIMATION 
+////////////////
 var lastRender = 0;
 function animate(timestamp) {
   var delta = Math.min(timestamp - lastRender, 500);
